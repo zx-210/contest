@@ -1,0 +1,33 @@
+ // 实时数据引擎
+    static class RealTimeDataEngine {
+        private final ConcurrentHashMap<String, EquipmentStatus> equipmentStatusMap = new ConcurrentHashMap<>();
+        private final Random random = new Random();
+        private final String[] equipmentNames = {"离心泵-001", "压缩机-002", "涡轮机-003", "传送带-004"};
+        private final String[] statusTypes = {"正常", "警告", "故障"};
+
+        public EquipmentStatus generateStatus(String equipmentId) {
+            double temperature = 20 + random.nextDouble() * 25;
+            double vibration = 0.5 + random.nextDouble() * 5;
+            double healthScore = 50 + random.nextDouble() * 50;
+            String status = statusTypes[random.nextInt(statusTypes.length)];
+            
+            return new EquipmentStatus(
+                equipmentId,
+                equipmentNames[Integer.parseInt(equipmentId.split("-")[1]) % equipmentNames.length],
+                temperature,
+                vibration,
+                status,
+                healthScore,
+                LocalDateTime.now()
+            );
+        }
+
+        public EquipmentStatus getStatus(String equipmentId) {
+            return equipmentStatusMap.computeIfAbsent(equipmentId, this::generateStatus);
+        }
+
+        public void updateAllStatus() {
+            equipmentStatusMap.values().forEach(status -> 
+                equipmentStatusMap.put(status.equipmentId, generateStatus(status.equipmentId)));
+        }
+    }
