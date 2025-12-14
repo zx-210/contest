@@ -1,4 +1,3 @@
-
 import numpy as np
 import pandas as pd
 from typing import Dict, List, Tuple, Optional
@@ -7,8 +6,6 @@ from dataclasses import dataclass
 from enum import Enum
 import logging
 from datetime import datetime
-
-
 # ============= 数据模型定义 =============
 class DeviceType(Enum):
     """设备类型枚举"""
@@ -18,8 +15,6 @@ class DeviceType(Enum):
     COMPRESSOR = "压缩机"
     CENTRIFUGAL_PUMP = "离心泵"
     CENTRIFUGAL_FAN = "离心式风机"
-
-
 class FaultType(Enum):
     """故障类型枚举"""
     UNBALANCE = "转子不平衡"
@@ -34,8 +29,6 @@ class FaultType(Enum):
     BEARING_INNER_RACE_WEAR = "轴承内圈磨损"
     BEARING_LUBRICATION = "轴承润滑不良"
     OIL_WHIRL = "油膜涡动"
-
-
 @dataclass
 class SensorData:
     """传感器数据结构"""
@@ -54,8 +47,6 @@ class SensorData:
     # 采样参数
     sampling_rate: int = 51200  # Z轴最高51.2kHz
     sample_points: int = 25600  # Z轴采样点数
-
-
 @dataclass
 class FaultDiagnosisResult:
     """故障诊断结果"""
@@ -68,37 +59,25 @@ class FaultDiagnosisResult:
     recommendation: str  # 维修建议
     features: Dict[str, float]  # 特征值
     waveform_data: Optional[np.ndarray] = None
-
-
 # ============= 特征提取模块 =============
 class FeatureExtractor:
-    """特征提取器 - 从原始数据提取故障特征"""
-
     @staticmethod
     def extract_vibration_features(vibration_data: np.ndarray,
                                    sampling_rate: float) -> Dict[str, float]:
-        """
-        提取振动信号特征
-        包含时域、频域特征
-        """
         features = {}
-
         # 时域特征
         features['rms'] = np.sqrt(np.mean(vibration_data ** 2))  # 有效值
         features['peak'] = np.max(np.abs(vibration_data))  # 峰值
         features['kurtosis'] = pd.Series(vibration_data).kurtosis()  # 峭度
         features['skewness'] = pd.Series(vibration_data).skew()  # 偏度
         features['crest_factor'] = features['peak'] / features['rms'] if features['rms'] > 0 else 0
-
         # 频域特征 (FFT变换)
         n = len(vibration_data)
         freq = np.fft.rfftfreq(n, d=1 / sampling_rate)
         fft_vals = np.abs(np.fft.rfft(vibration_data))
-
         if len(fft_vals) > 0:
             features['dominant_freq'] = freq[np.argmax(fft_vals)]
             features['dominant_amp'] = np.max(fft_vals)
-
             # 提取倍频特征 (1X, 2X, 3X...)
             if features['dominant_freq'] > 0:
                 for i in range(1, 4):
@@ -106,24 +85,19 @@ class FeatureExtractor:
                     idx = np.argmin(np.abs(freq - target_freq))
                     if idx < len(fft_vals):
                         features[f'harmonic_{i}X'] = fft_vals[idx]
-
         return features
-
     @staticmethod
     def extract_temperature_features(temperature: float,
                                      baseline_temp: float) -> Dict[str, float]:
-        """提取温度特征"""
         return {
             'temperature': temperature,
             'temp_deviation': temperature - baseline_temp,
             'temp_rate_of_change': 0  # 需要历史数据计算
         }
-
     @staticmethod
     def extract_magnetic_features(magnetic_x: float,
                                   magnetic_y: float,
                                   magnetic_z: float) -> Dict[str, float]:
-        """提取磁场特征"""
         magnetic_vector = np.array([magnetic_x, magnetic_y, magnetic_z])
         magnitude = np.linalg.norm(magnetic_vector)
 
@@ -137,11 +111,6 @@ class FeatureExtractor:
 
 # ============= 机器学习模型模块 =============
 class FaultDiagnosisModel:
-    """
-    故障诊断模型基类
-    支持多种算法：随机森林、深度神经网络等
-    """
-
     def __init__(self, model_type: str = "random_forest"):
         self.model_type = model_type
         self.model = None
