@@ -1,23 +1,12 @@
-  // 设备状态模型
-    static class EquipmentStatus {
-        String equipmentId;
-        String equipmentName;
-        double temperature;
-        double vibration;
-        String status;
-        double healthScore;
-        LocalDateTime timestamp;
+from datetime import datetime
 
-        public EquipmentStatus(String equipmentId, String equipmentName, 
-                              double temperature, double vibration, 
-                              String status, double healthScore, 
-                              LocalDateTime timestamp) {
-            this.equipmentId = equipmentId;
-            this.equipmentName = equipmentName;
-            this.temperature = temperature;
-            this.vibration = vibration;
-            this.status = status;
-            this.healthScore = healthScore;
-            this.timestamp = timestamp;
-        }
-    }
+class EquipmentStatus:
+    def __init__(self, equipment_id: str, equipment_name: str, temperature: float, 
+                 vibration: float, status: str, health_score: float, timestamp: datetime):
+        self.equipment_id = equipment_id
+        self.equipment_name = equipment_name
+        self.temperature = temperature
+        self.vibration = vibration
+        self.status = status
+        self.health_score = health_score
+        self.timestamp = timestamp
