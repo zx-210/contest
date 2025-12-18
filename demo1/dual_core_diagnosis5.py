@@ -36,3 +36,27 @@ if __name__ == "__main__":
     print(f"设备ID: {diagnosis_result['device_id']}")
     print(f"初步诊断: {diagnosis_result['preliminary_result']}")
     print(f"最终诊断: {diagnosis_result['final_result']}")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

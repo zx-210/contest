@@ -1,44 +1,27 @@
-def build_knowledge_graph():
-    return {"nodes": [], "edges": []}
-def calculate_inner_ring_frequency(bearing_params):
-    return "100-150Hz"
-class FaultKnowledgeGraph:
-    def __init__(self):
-        self.graph = build_knowledge_graph()  # 加载预构建图谱
-        self.fault_mechanism_rules = {
-            "转子不平衡": {"key_frequency": "1倍频", "energy_ratio": ">50%"},
-            "轴承内圈故障": {"feature_frequency": calculate_inner_ring_frequency(0)},
-            "转子不对中": {"key_frequency": "2倍频", "energy_ratio": ">80%"},
-            "紊流故障": {"frequency_band": "200-500Hz", "fluctuation": ">15%"},
-        }
-    def check_feature_match(self, features, rules):
-        return True
-    def infer_cause(self, fault_type):
-        causes = {
-            "转子不平衡": "转子质量分布不均匀或装配问题",
-            "轴承内圈故障": "轴承内圈磨损或安装不当",
-            "转子不对中": "联轴器对中不良",
-            "紊流故障": "流体动力不稳定"
-        }
-        return causes.get(fault_type, "未知原因")
-    def correct_diagnosis(self, preliminary_result, features):
-        return {
-            "fault_type": "修正后的故障类型",
-            "confidence": 0.9,
-            "cause": self.infer_cause("修正后的故障类型")
-        }
-    def verify_diagnosis(self, preliminary_result, features):
-        fault_type = preliminary_result.get("建议模型", "未知故障").replace("模型", "")
-        rules = self.fault_mechanism_rules.get(fault_type, {})
-        if self.check_feature_match(features, rules):
-            return self.infer_cause(fault_type)  # 图谱因果推理
-        else:
-            return self.correct_diagnosis(preliminary_result, features)
-if __name__ == "__main__":
-    kg = FaultKnowledgeGraph()
-    test_result = {"建议模型": "轴承内圈磨损模型"}
-    test_features = {"frequency": "120Hz", "amplitude": 0.8}
-    verification = kg.verify_diagnosis(test_result, test_features)
-    print("知识图谱验证结果:", verification)
-class FaultKnowledgeGraph:
-    pass
+import random
+import numpy as np
+from sklearn.svm import SVC
+
+# 双核驱动核心诊断流程
+def fault_diagnosis(device_id):
+    # 1. 模拟采集振动/温度/磁场数据（数据层）
+    vib_rms = random.uniform(0.2, 1.0)  # 振动有效值
+    temp = 45 + random.uniform(-2, 5)    # 温度
+    mag = 100 + random.uniform(-5, 8)    # 磁场
+
+    # 2. 数据核：SVM模型推理故障
+    svm = SVC(kernel='rbf', probability=True)
+    svm.fit(np.random.rand(30,3), ["转子不平衡", "正常", "轴承内圈故障"]*10)
+    pred = svm.predict_proba([[vib_rms, temp, mag]])[0]
+    fault = svm.classes_[np.argmax(pred)]
+    conf = round(np.max(pred), 2)
+
+    # 3. 知识核：专家规则校验
+    verify = True if (fault=="正常" or vib_rms>0.5) else False
+    msg = "校验通过" if verify else "物理规则不匹配"
+
+    # 输出结果
+    return {"设备ID":device_id, "诊断结果":fault if verify else "待确认", "置信度":conf, "校验":msg}
+
+# 演示运行
+print(fault_diagnosis("DEV-001"))
