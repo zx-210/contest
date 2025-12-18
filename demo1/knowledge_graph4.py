@@ -25,3 +25,8 @@ def fault_diagnosis(device_id):
 
 # 演示运行
 print(fault_diagnosis("DEV-001"))
+
+
+
+
+
