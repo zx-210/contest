@@ -17,6 +17,7 @@ class MLModelMatrix:
                                          ('magnetic_feat', 'fault_type')])
         self.bn_infer = VariableElimination(self.bn_model)
 
+
     # 模型训练：从海量数据中学习健康状态规律
     def train(self, train_data, train_labels):
         # 提取高维特征（振动频谱、温度趋势、磁场强度）
